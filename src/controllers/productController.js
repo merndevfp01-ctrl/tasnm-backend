@@ -38,7 +38,11 @@ class productController {
     static editProduct = async(req, res) => {
         try {
             const isExist = await productModel.findById(req.params.id);
-            
+            if(!isExist){
+                return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
+            }
+            const product = await productModel.findByIdAndUpdate(req.params.id, req.body, {new: true});
+            return SuccessResponse(res, STATUSCODE.OK,"Product" + SUCCESS.UPDATED, product)
         } catch (error) {
             console.log(error);
             return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
@@ -54,3 +58,5 @@ class productController {
         }
     }
 }
+
+export default productController
