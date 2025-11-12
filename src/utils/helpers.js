@@ -5,8 +5,9 @@ export const SUCCESS = {
     DELETED: "Deleted Successfully"
 }
 export const ERROR = {
-    SERVER_ERROR: "Internal Server Error",
-    NOT_FOUND: "Resource Not Found",
+    INTERNAL_SERVER_ERROR: "Internal Server Error",
+    ALREADY_EXISTS: "Already Exists",
+    NOT_FOUND: "Not Found",
     BAD_REQUEST: "Bad Request",
     UNAUTHORIZED: "Unauthorized Access"
 }
