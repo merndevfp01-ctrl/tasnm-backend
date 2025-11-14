@@ -1,16 +1,24 @@
-const productModel = require("../models/productModel");
+const Product = require("../models/Product");
 const { ERROR, STATUSCODE, SUCCESS } = require("../utils/helpers");
 const { ErrorResponse, SuccessResponse } = require("../utils/responseHandler");
 
 const createProduct = async (req, res) => {
     try {
-        const isExist = await productModel.findOne({ productName: req.body.productName });
+        const { name, description, category, price } = req.body;
+        const isExist = await Product.findOne({ name });
         if (isExist) {
             return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.ALREADY_EXISTS,);
         }
-        const product = new productModel(req.body);
+        const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+        const product = new Product({
+            name: name,
+            description: description,
+            category: category,
+            price: price,
+            image: imagePath
+        });
         await product.save();
-        return SuccessResponse(res, STATUSCODE.CREATED, "Product" + SUCCESS.CREATED, product);
+        return SuccessResponse(res, STATUSCODE.CREATED, ("Product" + SUCCESS.CREATED), product);
     } catch (error) {
         console.log(error);
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error);
@@ -19,8 +27,8 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await productModel.find();
-        return SuccessResponse(res, STATUSCODE.OK, "Product" + SUCCESS.OK, products)
+        const products = await Product.find();
+        return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.OK), products)
     } catch (error) {
         console.log(error);
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error);
@@ -29,8 +37,8 @@ const getAllProducts = async (req, res) => {
 
 const getProductsById = async (req, res) => {
     try {
-        const product = await productModel.findById(req.params.id)
-        return SuccessResponse(res, STATUSCODE.OK, "Product" + SUCCESS.OK, product)
+        const product = await Product.findById(req.params.id)
+        return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.OK), product)
     } catch (error) {
         console.log(error);
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
@@ -39,12 +47,12 @@ const getProductsById = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
-        const isExist = await productModel.findById(req.params.id);
+        const isExist = await Product.findById(req.params.id);
         if (!isExist) {
             return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
         }
-        const product = await productModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        return SuccessResponse(res, STATUSCODE.OK, "Product" + SUCCESS.UPDATED, product)
+        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.UPDATED), product)
     } catch (error) {
         console.log(error);
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
@@ -53,8 +61,8 @@ const editProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try {
-        const product = await productModel.findByIdAndDelete(req.params.id);
-        return SuccessResponse(res, STATUSCODE.OK, "Product" + SUCCESS.DELETED, product)
+        const product = await Product.findByIdAndDelete(req.params.id);
+        return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.DELETED), product)
     } catch (error) {
         console.log(error);
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)

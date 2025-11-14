@@ -1,4 +1,4 @@
-const userModel = require("../models/userModel");
+const User = require("../models/User");
 const jwt = require('jsonwebtoken');
 const { SuccessResponse, ErrorResponse } = require("../utils/responseHandler");
 const { SUCCESS, ERROR, STATUSCODE } = require("../utils/helpers");
@@ -9,14 +9,14 @@ const generateToken = (userId) => {
 
 const register = async (req, res) => {
     try {
-        const isExist = await userModel.findOne({email : req.body.email});
+        const isExist = await User.findOne({email : req.body.email});
         if (isExist) {
             return ErrorResponse(res, STATUSCODE.BAD_REQUEST, ERROR.ALREADY_EXISTS);
         }
-        const user = new userModel(req.body);
+        const user = new User(req.body);
         await user.save();
-        const token = generateToken(user._id);
-        return SuccessResponse(res, STATUSCODE.OK, SUCCESS.REGISTER,{ token, user })
+        // const token = generateToken(user._id);
+        return SuccessResponse(res, STATUSCODE.OK, SUCCESS.REGISTER,{  user })
     } catch (error) {
         console.log(error)
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR);
@@ -26,7 +26,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userModel.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.USER_NOT_FOUND);
     }

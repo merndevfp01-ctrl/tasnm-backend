@@ -5,7 +5,8 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: [true, 'name is required'] },
     email: { type: String, required: [true, 'email is required'] },
     password: { type: String, required: [true, 'password is required'] },
-    role: { type: String, enum: ["admin", "customer"], default:"customer" }
+    role: { type: String, enum: [0, 1], default:0},
+    deletedAt: {type: Date},
 },
     { timestamps: true }
 );
@@ -21,5 +22,5 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const userModel = mongoose.model('user', userSchema);
+const userModel = mongoose.model('users',userSchema);
 module.exports = userModel
