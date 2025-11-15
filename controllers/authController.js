@@ -7,6 +7,27 @@ const generateToken = (userId) => {
     return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "1d" });
 }
 
+
+const protect = async (req, res, next) => {
+    try {
+        const token = req.header.authorization?.split(" ")[1];
+        if (!token) {
+            return ErrorResponse(res, STATUSCODE.UNAUTHORIZED, ERROR.UNAUTHORIZED)
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await userModel.findById(decoded.id).select("-password");
+        if (!user) {
+            return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
+        }
+        req.user = user;
+        next();
+    } catch (error) {
+        console.log(error)
+        return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
+    }
+}
+
+
 const register = async (req, res) => {
     try {
         const isExist = await User.findOne({email : req.body.email});
@@ -15,7 +36,6 @@ const register = async (req, res) => {
         }
         const user = new User(req.body);
         await user.save();
-        // const token = generateToken(user._id);
         return SuccessResponse(res, STATUSCODE.OK, SUCCESS.REGISTER,{  user })
     } catch (error) {
         console.log(error)
@@ -32,7 +52,7 @@ const login = async (req, res) => {
     }
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return ErrorResponse(res, STATUSCODE.BAD_REQUEST, ERROR.INVALID_CREDENTIALS);
+      return ErrorResponse(res, STATUSCODE.BAD_REQUEST, ERROR.BAD_REQUEST);
     }
     const token = generateToken(user._id);
     return SuccessResponse(res, STATUSCODE.OK, SUCCESS.LOGIN, { token, user });
@@ -43,4 +63,4 @@ const login = async (req, res) => {
 };
 
 
-module.exports = {register, login}
+module.exports = {register, login, protect}

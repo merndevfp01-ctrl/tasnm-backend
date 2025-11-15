@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema({
     description: { type: String },
     category: { type: String, required: [true, 'category is required'] },
     price: { type: Number, required: [true, 'price is required'] },
-    addedBy: { type: Schema.Types.ObjectId, ref: "user" },
+    addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     deletedAt: { type: Date, },
 },
     { timestamps: true }

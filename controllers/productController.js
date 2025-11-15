@@ -15,7 +15,8 @@ const createProduct = async (req, res) => {
             description: description,
             category: category,
             price: price,
-            image: imagePath
+            image: imagePath,
+            addedBy
         });
         await product.save();
         return SuccessResponse(res, STATUSCODE.CREATED, ("Product" + SUCCESS.CREATED), product);
@@ -47,11 +48,20 @@ const getProductsById = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
+        const { name, description, category, price } = req.body;
         const isExist = await Product.findById(req.params.id);
         if (!isExist) {
             return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
         }
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+        const product = await Product.findByIdAndUpdate(req.params.id, {
+            name,
+            description,
+            category,
+            price,
+            image: imagePath
+        },
+            { new: true });
         return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.UPDATED), product)
     } catch (error) {
         console.log(error);
