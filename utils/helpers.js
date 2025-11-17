@@ -4,7 +4,8 @@ const SUCCESS = {
   UPDATED: "Updated Successfully",
   DELETED: "Deleted Successfully",
   REGISTER: "Register Successfully",
-  LOGIN: "Login Successfully"
+  LOGIN: "Login Successfully",
+  RESTORE: "Restore Successfully"
 };
 
 const ERROR = {

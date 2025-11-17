@@ -16,7 +16,7 @@ const createProduct = async (req, res) => {
             category: category,
             price: price,
             image: imagePath,
-            addedBy
+            addedBy: req.user._id
         });
         await product.save();
         return SuccessResponse(res, STATUSCODE.CREATED, ("Product" + SUCCESS.CREATED), product);
@@ -69,9 +69,16 @@ const editProduct = async (req, res) => {
     }
 }
 
-const deleteProduct = async (req, res) => {
+const softDeleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            { $set: { isDeleted: true, deletedAt: Date.now() } },
+            { new: true }
+        );
+        if (!product) {
+            return ErrorResponse(STATUSCODE.NOT_FOUND, ("Product" + ERROR.NOT_FOUND))
+        }
         return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.DELETED), product)
     } catch (error) {
         console.log(error);
@@ -79,4 +86,31 @@ const deleteProduct = async (req, res) => {
     }
 }
 
-module.exports = { createProduct, getAllProducts, getProductsById, editProduct, deleteProduct }
+const restoreProduct = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            { $set: { isDeleted: false } },
+            { new: true }
+        )
+        if (!product) {
+            return ErrorResponse(STATUSCODE.NOT_FOUND, ("Product " + ERROR.NOT_FOUND));
+        }
+        return SuccessResponse(res, STATUSCODE.OK, ("Product " + SUCCESS.RESTORE), product )
+    } catch (error) {
+        console.log(error);
+        return ErrorResponse(STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
+    }
+}
+
+const getDeletedProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ isDeleted: true });
+        return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.OK), products)
+    } catch (error) {
+        console.log(error);
+        return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error);
+    }
+}
+
+module.exports = { createProduct, getAllProducts, getProductsById, editProduct, softDeleteProduct, getDeletedProducts, restoreProduct }

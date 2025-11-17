@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
     category: { type: String, required: [true, 'category is required'] },
     price: { type: Number, required: [true, 'price is required'] },
     addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+    isDeleted:{type: Boolean, default: false},
     deletedAt: { type: Date, },
 },
     { timestamps: true }

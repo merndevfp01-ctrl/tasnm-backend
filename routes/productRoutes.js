@@ -4,7 +4,8 @@ const {
   getAllProducts,
   getProductsById,
   editProduct,
-  deleteProduct
+  softDeleteProduct,
+  restoreProduct
 } = require('../controllers/productController');
 const upload = require('../middleware/upload');
 const { protect } = require('../controllers/authController');
@@ -12,9 +13,11 @@ const { protect } = require('../controllers/authController');
 const router = express.Router();
 
 router.post('/createproduct', protect, upload.single('image'), createProduct);
-router.get('/getproduct', getAllProducts);
-router.get('/getproduct/:id', getProductsById);
-router.put('/editproduct/:id', upload.single('image'), editProduct);
-router.delete('/deleteproduct/:id', deleteProduct);
+router.get('/getproduct', protect, getAllProducts);
+router.get('/getproduct/:id', protect, getProductsById);
+router.put('/editproduct/:id', protect, upload.single('image'), editProduct);
+router.put('/deleteproduct/:id', protect, softDeleteProduct);
+router.get('/deletedproducts', protect, softDeleteProduct);
+router.put('/restoreProduct/:id', protect, restoreProduct)
 
 module.exports = router;

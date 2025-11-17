@@ -10,12 +10,13 @@ const generateToken = (userId) => {
 
 const protect = async (req, res, next) => {
     try {
-        const token = req.header.authorization?.split(" ")[1];
+        const tokenkey = req.headers.authorization || req.headers.Authorization;
+        const token = tokenkey?.split(" ")[1];
         if (!token) {
             return ErrorResponse(res, STATUSCODE.UNAUTHORIZED, ERROR.UNAUTHORIZED)
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userModel.findById(decoded.id).select("-password");
+        const user = await User.findById(decoded.id).select("-password");
         if (!user) {
             return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
         }
