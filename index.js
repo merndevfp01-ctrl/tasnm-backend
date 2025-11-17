@@ -20,6 +20,10 @@ app.use("/uploads", express.static("uploads"));
 app.use('/product', productRoutes)
 app.use('/auth', authRoutes)
 
+app.get('/', (req, res) => {
+    res.json({message:"Backend is running.."})
+})
+
 app.listen(PORT,() => {
     console.log(`Server is running on port http://localhost:${PORT}`);
 })
