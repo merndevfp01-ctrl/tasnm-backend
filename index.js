@@ -1,4 +1,5 @@
 const express = require('express');
+require("./config/db.js");
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -10,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Database Connection
-connectDB();
+// connectDB();
 
 app.use(cors());
 app.use(express.json());
