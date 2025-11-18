@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes.js')
+const cartRoutes = require('./routes/cartRoutes.js')
 
 dotenv.config();
 const app = express();
@@ -20,6 +21,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.use('/product', productRoutes)
 app.use('/auth', authRoutes)
+app.use('/cart', cartRoutes)
 
 app.get('/', (req, res) => {
     res.json({message:"Backend is running.."})

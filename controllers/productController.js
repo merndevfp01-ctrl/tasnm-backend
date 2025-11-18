@@ -28,6 +28,16 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
+        const products = await Product.find({isDeleted: false});
+        return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.OK), products)
+    } catch (error) {
+        console.log(error);
+        return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error);
+    }
+}
+
+const getAllProductsAdmin = async (req, res) => {
+    try {
         const products = await Product.find();
         return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.OK), products)
     } catch (error) {
@@ -96,7 +106,7 @@ const restoreProduct = async (req, res) => {
         if (!product) {
             return ErrorResponse(STATUSCODE.NOT_FOUND, ("Product " + ERROR.NOT_FOUND));
         }
-        return SuccessResponse(res, STATUSCODE.OK, ("Product " + SUCCESS.RESTORE), product )
+        return SuccessResponse(res, STATUSCODE.OK, ("Product " + SUCCESS.RESTORE), product)
     } catch (error) {
         console.log(error);
         return ErrorResponse(STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
@@ -113,4 +123,4 @@ const getDeletedProducts = async (req, res) => {
     }
 }
 
-module.exports = { createProduct, getAllProducts, getProductsById, editProduct, softDeleteProduct, getDeletedProducts, restoreProduct }
+module.exports = { createProduct, getAllProducts, getAllProductsAdmin, getProductsById, editProduct, softDeleteProduct, getDeletedProducts, restoreProduct }

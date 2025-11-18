@@ -2,6 +2,7 @@ const express = require('express');
 const {
   createProduct,
   getAllProducts,
+  getAllProductsAdmin,
   getProductsById,
   editProduct,
   softDeleteProduct,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.post('/createproduct', protect, upload.single('image'), createProduct);
 router.get('/getproduct', protect, getAllProducts);
+router.get('/getproductadmin', protect, getAllProductsAdmin);
 router.get('/getproduct/:id', protect, getProductsById);
 router.put('/editproduct/:id', protect, upload.single('image'), editProduct);
 router.put('/deleteproduct/:id', protect, softDeleteProduct);
