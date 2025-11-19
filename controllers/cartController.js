@@ -4,27 +4,52 @@ const { ErrorResponse, SuccessResponse } = require("../utils/responseHandler")
 
 const addToCart = async (req, res) => {
     try {
-        const { product, user } = req.body;
+        const { product, user, qty } = req.body;
         if (!product || !user) {
             return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
         }
-        const isExist = await Cart.findOne({ product, user });
-        if (isExist) {
-            return ErrorResponse(res, STATUSCODE.BAD_REQUEST, ERROR.ALREADY_EXISTS)
+        const cartItem = await Cart.findOne({ product, user }).populate("product");
+        console.log("Price", cartItem.product.price)
+        if (cartItem) {
+            cartItem.qty = cartItem.qty + (qty || 1);
+            
+            await cartItem.save();
+            return SuccessResponse(res, STATUSCODE.OK, SUCCESS.OK, cartItem);
+        } else {
+            const cart = new Cart({ product, user, qty: qty || 1 });
+            await cart.save();
+            return SuccessResponse(res, STATUSCODE.CREATED, SUCCESS.CREATED, cart)
         }
-        const cart = new Cart({ product, user });
-        cart.save();
-        return SuccessResponse(res, STATUSCODE.CREATED, SUCCESS.CREATED, cart)
+
     } catch (error) {
         console.log(error)
         return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
     }
 }
 
+const decreaseQuantity = async (req, res) => {
+    try {
+        const { product, user, qty } = req.body;
+        if (!product || !user) {
+            return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
+        }
+        const cartItem = await Cart.findOne({ product, user });
+        if (!cartItem) {
+            return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND, error)
+        }
+        cartItem.qty = cartItem.qty - (qty || 1)
+        await cartItem.save();
+        return SuccessResponse(res, STATUSCODE.OK, SUCCESS.UPDATED)
+    } catch (error) {
+        console.log(error);
+        return ErrorResponse(res, STATUSCODE.INTERNAL_SERVER_ERROR, ERROR.INTERNAL_SERVER_ERROR, error)
+    }
+}
+
 const getProductInCart = async (req, res) => {
     try {
-        const { id } = req?.params;
-        const cart = await Cart.findById(id).populate("product").populate("user")
+        const { userId } = req?.params;
+        const cart = await Cart.find({ user: userId }).populate("product").populate("user")
         return SuccessResponse(res, STATUSCODE.OK, SUCCESS.OK, cart)
     } catch (error) {
         console.log(error)
@@ -57,4 +82,4 @@ const clearCart = async (req, res) => {
     }
 }
 
-module.exports = { addToCart, getProductInCart, clearCart, deleteCart }
+module.exports = { addToCart, getProductInCart, clearCart, deleteCart, decreaseQuantity }

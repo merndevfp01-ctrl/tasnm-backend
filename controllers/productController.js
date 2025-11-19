@@ -28,7 +28,7 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find({isDeleted: false});
+        const products = await Product.find({ isDeleted: false });
         return SuccessResponse(res, STATUSCODE.OK, ("Product" + SUCCESS.OK), products)
     } catch (error) {
         console.log(error);
@@ -64,7 +64,8 @@ const editProduct = async (req, res) => {
             return ErrorResponse(res, STATUSCODE.NOT_FOUND, ERROR.NOT_FOUND)
         }
         const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
-        const product = await Product.findByIdAndUpdate(req.params.id, {
+        const product = await Product.findByIdAndUpdate(
+            req.params.id, {
             name,
             description,
             category,
